@@ -1,0 +1,11 @@
+[package]
+name = "json-position-parser"
+version = "0.0.3"
+authors = ["derjones <jones@freshx.de>"]
+edition = "2018"
+license = "MIT"
+description = "A simple json parser with positions."
+repository = "https://github.com/derjones/json-position-parser"
+
+[profile.release]
+lto = true
