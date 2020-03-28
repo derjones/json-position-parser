@@ -17,9 +17,9 @@ use types::{ParseError, ParseResult};
 /// };
 /// ```
 pub fn parse_json(text: &str) -> ParseResult<Tree> {
-    let mut vec = Vec::new();
-    tokenize::tokenize(&text, &mut vec);
-    parse::parse_json(&vec[..])
+    tokenize::tokenize(&text)
+        .map(|tokens| tokens)
+        .and_then(|tokens| parse::parse_json(&tokens[..]))
 }
 
 /// Parse a json file:
@@ -35,11 +35,8 @@ pub fn parse_json(text: &str) -> ParseResult<Tree> {
 pub fn parse_json_file(file_path: &str) -> ParseResult<Tree> {
     match fs::read_to_string(file_path) {
         Ok(text) => {
-            let mut vec = Vec::new();
-            tokenize::tokenize(&text, &mut vec);
-            parse::parse_json(&vec[..])
+            parse_json(&text)
         }
         Err(_) => Err(ParseError::FileNotFound),
     }
 }
-

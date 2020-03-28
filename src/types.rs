@@ -4,6 +4,7 @@ use std::{error, fmt, ops::Add};
 pub enum ParseError {
     MissingObjectBrace,
     MissingArrayBrace,
+    InvalidType,
     FileNotFound,
     Error,
 }
@@ -14,6 +15,7 @@ impl fmt::Display for ParseError {
             ParseError::MissingArrayBrace => write!(f, "Missing array brace"),
             ParseError::MissingObjectBrace => write!(f, "Missing object brace"),
             ParseError::FileNotFound => write!(f, "File not found"),
+            ParseError::InvalidType => write!(f, "Found invalid type"),
             ParseError::Error => write!(f, "Could not parse json"),
         }
     }
