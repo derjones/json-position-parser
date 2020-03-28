@@ -233,8 +233,8 @@ mod tests {
 
     #[test]
     fn test_tokenize() {
-        let primitives = "{ \"string\": \"value\", \"null\": null, \"bool1\": false, \"bool2\": true, \"int\": 1, \"float\": 1.0, \"array\": [] }";
-        match tokenize(primitives) {
+        let to_tokenize = "{ \"string\": \"value\", \"null\": null, \"bool1\": false, \"bool2\": true, \"int\": 1, \"float\": 1.0, \"array\": [] }";
+        match tokenize(to_tokenize) {
             Ok(tokens) => {
                 equal_token_single(
                     tokens.get(0).unwrap(),

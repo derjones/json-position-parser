@@ -34,9 +34,73 @@ pub fn parse_json(text: &str) -> ParseResult<Tree> {
 /// ```
 pub fn parse_json_file(file_path: &str) -> ParseResult<Tree> {
     match fs::read_to_string(file_path) {
-        Ok(text) => {
-            parse_json(&text)
-        }
+        Ok(text) => parse_json(&text),
         Err(_) => Err(ParseError::FileNotFound),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::tree::{EntryType, PathType};
+    #[test]
+    fn test_parse() {
+        let json = "{ \"a\": {}, \"b\": { \"c\": [true, { \"e\": 42 } ] } }";
+        match super::parse_json(json) {
+            Ok(tree) => {
+                let res = tree.value_at(&[PathType::Object("a")]);
+                let entry = res.get(0).unwrap();
+                match (*(*entry)).entry_type {
+                    EntryType::JSONObject(_) => println!("Correct entry"),
+                    _ => panic!("Should be object"),
+                }
+
+                let res = tree.value_at(&[
+                    PathType::Object("b"),
+                    PathType::Object("c"),
+                    PathType::Array(1),
+                    PathType::Object("e"),
+                ]);
+                let entry = res.get(0).unwrap();
+                match (*(*entry)).entry_type {
+                    EntryType::Int(val) => assert_eq!(42, val),
+                    _ => panic!("Should be number"),
+                }
+
+                let res = tree.value_at(&[
+                    PathType::Wildcard,
+                    PathType::Object("c"),
+                    PathType::Array(0),
+                ]);
+                let entry = res.get(0).unwrap();
+                match (*(*entry)).entry_type {
+                    EntryType::Bool(val) => assert_eq!(true, val),
+                    _ => panic!("Should be bool"),
+                }
+
+                let res = tree.value_at(&[
+                    PathType::RecursiveWildcard,
+                    PathType::Array(1),
+                    PathType::Object("e"),
+                ]);
+                let entry = res.get(0).unwrap();
+                match (*(*entry)).entry_type {
+                    EntryType::Int(val) => assert_eq!(42, val),
+                    _ => panic!("Should be number"),
+                }
+
+                let res = tree.value_at(&[
+                    PathType::Wildcard,
+                    PathType::Object("c"),
+                    PathType::Array(1),
+                    PathType::Object("e"),
+                ]);
+                let entry = res.get(0).unwrap();
+                match (*(*entry)).entry_type {
+                    EntryType::Int(val) => assert_eq!(42, val),
+                    _ => panic!("Should be number"),
+                }
+            }
+            Err(_) => panic!("Could not parse json."),
+        }
     }
 }
