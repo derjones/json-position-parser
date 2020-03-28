@@ -4,7 +4,7 @@ A simple json parser with positions.
 
 Example:
 ```
-let json = "{ \"a\": {}, \"b\": { \"c\": [true, { \"e\": 42 } ] } }";
+let json = "{ \"a\": {}, \"b\": { \"c\": [true, { \"e\": 42 } ] }, \"f\": [false, { \"e\": 21 } } ] } }";
 match super::parse_json(json) {
     Ok(tree) => {
         //
@@ -46,7 +46,7 @@ match super::parse_json(json) {
             PathType::Object("e"),
         ]);
 
-        // [Entry { key: Some(3), range: Range { start: Position { line: 0, char: 37, idx: 37 }, end: Position { line: 0, char: 39, idx: 39 } }, entry_type: Int(42) }]
+        // [Entry { key: Some(5), range: Range { start: Position { line: 0, char: 67, idx: 67 }, end: Position { line: 0, char: 69, idx: 69 } }, entry_type: Int(21) }, Entry { key: Some(3), range: Range { start: Position { line: 0, char: 37, idx: 37 }, end: Position { line: 0, char: 39, idx: 39 } }, entry_type: Int(42) }]
         println!("{:?}", res);
     }
     _ => panic!("Could not parse json."),
