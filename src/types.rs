@@ -4,6 +4,7 @@ use std::{error, fmt, ops::Add};
 pub enum ParseError {
     MissingObjectBrace,
     MissingArrayBrace,
+    InvalidType,
     FileNotFound,
     Error,
 }
@@ -11,6 +12,7 @@ pub enum ParseError {
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
+            ParseError::InvalidType => write!(f, "Found invalid type"),
             ParseError::MissingArrayBrace => write!(f, "Missing array brace"),
             ParseError::MissingObjectBrace => write!(f, "Missing object brace"),
             ParseError::FileNotFound => write!(f, "File not found"),
@@ -31,6 +33,12 @@ pub type ParseResult<T> = Result<T, ParseError>;
 pub struct Range {
     pub start: Position,
     pub end: Position,
+}
+
+impl Range {
+    pub fn new(start: Position, end: Position) -> Range {
+        Range { start, end }
+    }
 }
 
 #[derive(Debug, Copy, Clone)]

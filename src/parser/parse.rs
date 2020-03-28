@@ -225,11 +225,11 @@ fn handle_object(
                 return Ok(());
             }
             match token {
-                TokenType::Comma => {
+                TokenType::Comma(_) => {
                     is_key = true;
                     Ok(())
                 }
-                TokenType::Semicolon => {
+                TokenType::Semicolon(_) => {
                     is_key = false;
                     Ok(())
                 }

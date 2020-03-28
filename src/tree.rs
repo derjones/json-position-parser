@@ -134,7 +134,7 @@ impl Tree {
     /// let text = "{ \"a\": { \"b\": ["c"] } }";
     /// match parse_json(&text) {
     ///     Ok(tree) => {
-    ///         let keys = tree.values_at([
+    ///         let keys = tree.values_at(&[
     ///            PathType::Object("a"),
     ///            PathType::Object("b"),
     ///            PathType::Array(0),
@@ -167,7 +167,7 @@ impl Tree {
     /// let text = "{ \"a\": { \"b\": ["c"] } }";
     /// match parse_json(&text) {
     ///     Ok(tree) => {
-    ///         let keys = tree.keys_at([
+    ///         let keys = tree.keys_at(&[
     ///            PathType::Object("a"),
     ///            PathType::Object("b"),
     ///            PathType::Array(0),

@@ -1,6 +1,6 @@
 [package]
 name = "json-position-parser"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["derjones <jones@freshx.de>"]
 edition = "2018"
 license = "MIT"
@@ -9,3 +9,6 @@ repository = "https://github.com/derjones/json-position-parser"
 
 [profile.release]
 lto = true
+
+[dev-dependencies]
+float-cmp = "0.6.0"
