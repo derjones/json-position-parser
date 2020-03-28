@@ -33,6 +33,12 @@ pub struct Range {
     pub end: Position,
 }
 
+impl Range {
+    pub fn new(start: Position, end: Position) -> Range {
+        Range {start, end}
+    }
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct Position {
     pub line: usize,

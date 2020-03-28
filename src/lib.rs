@@ -42,3 +42,4 @@ pub fn parse_json_file(file_path: &str) -> ParseResult<Tree> {
         Err(_) => Err(ParseError::FileNotFound),
     }
 }
+
