@@ -1,5 +1,4 @@
-use std::error;
-use std::fmt;
+use std::{error, fmt, ops::Add};
 
 #[derive(Debug, Clone)]
 pub enum ParseError {
@@ -55,12 +54,15 @@ impl Position {
     pub fn new(line: usize, char: usize, idx: usize) -> Position {
         Position { line, char, idx }
     }
+}
 
-    pub fn add(&self, line: usize, char: usize) -> Position {
-        Position {
-            line: self.line + line,
-            char: self.char + char,
-            idx: self.idx + char,
+impl Add for Position {
+    type Output = Self;
+    fn add(self, other: Self) -> Self::Output {
+        Self {
+            line: self.line + other.line,
+            char: self.char + other.char,
+            idx: self.idx + other.idx,
         }
     }
 }
