@@ -31,7 +31,7 @@ pub struct Tree {
     pub keys: Vec<Key>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PathType<'input> {
     Object(&'input str),
     Array(usize),
