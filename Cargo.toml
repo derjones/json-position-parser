@@ -1,6 +1,6 @@
 [package]
 name = "json-position-parser"
-version = "0.0.9"
+version = "0.0.10"
 authors = ["derjones <jones@freshx.de>"]
 edition = "2018"
 license = "MIT"
