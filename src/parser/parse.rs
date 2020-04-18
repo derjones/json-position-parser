@@ -12,7 +12,9 @@ fn pre_calculate_positions(tokens: &[TokenType]) -> HashMap<usize, usize> {
         .iter()
         .enumerate()
         .for_each(|(idx, token)| match token {
-            TokenType::ObjectOpen(_) => object_stack.push(idx),
+            TokenType::ObjectOpen(_) => {
+                object_stack.push(idx);
+            }
             TokenType::ObjectClose(_) => {
                 if let Some(start) = object_stack.pop() {
                     hash.insert(start, idx);
@@ -339,9 +341,11 @@ pub fn parse_json(tokens: &[TokenType]) -> ParseResult<Tree> {
         keys: vec![],
     };
 
-    let pre_calc = pre_calculate_positions(tokens);
-    pre_calc.get(&0).ok_or(ParseError::MissingObjectBrace)?;
-    handle_object(&mut tree, tokens, &pre_calc, 0).map(|(hash, range)| {
+    let pre_calc = pre_calculate_positions(&tokens);
+    pre_calc
+        .get(&0)
+        .ok_or(ParseError::MissingObjectBrace)?;
+    handle_object(&mut tree, &tokens, &pre_calc, 0).map(|(hash, range)| {
         tree.entries.push(Entry {
             key: None,
             range,
