@@ -4,6 +4,7 @@ pub mod types;
 use parser::{parse, tokenize};
 use std::fs;
 use tree::Tree;
+use tokenize::TokenType;
 use types::{ParseError, ParseResult};
 
 /// Parse a json text:
@@ -19,7 +20,18 @@ use types::{ParseError, ParseResult};
 pub fn parse_json(text: &str) -> ParseResult<Tree> {
     tokenize::tokenize(&text)
         .map(|tokens| tokens)
-        .and_then(|tokens| parse::parse_json(&tokens[..]))
+        .and_then(|tokens| {
+
+            let filtered_tokens: Vec<TokenType> = tokens.into_iter().filter(|e| {
+                if let TokenType::Comment(_,_) = e {
+                    return false;
+                }
+        
+                true
+            }).collect();
+            
+            parse::parse_json(&filtered_tokens[..])
+        })
 }
 
 /// Parse a json file:
@@ -44,7 +56,7 @@ mod tests {
     use super::tree::{EntryType, PathType};
     #[test]
     fn test_parse() {
-        let json = "{ \"a\": {}, \"b\": { \"c\": [true, { \"e\": 42 } ] } }";
+        let json = "// hello\n { \n // this is a test\n \"a\": {}, \"b\": { \"c\": [true, { \"e\": 42 } ] } } // bli \n// bla";
         match super::parse_json(json) {
             Ok(tree) => {
                 let res = tree.value_at(&[PathType::Object("a")]);
