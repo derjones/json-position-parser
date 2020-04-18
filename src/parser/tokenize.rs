@@ -1,7 +1,6 @@
 use super::types::{ParseError, ParseResult, Position, Range};
 
 enum CurrentTokenType {
-    Comment,
     String,
     Number,
     Bool,
@@ -21,7 +20,6 @@ pub enum TokenType {
     ArrayClose(Range),
     Comma(Range),
     Semicolon(Range),
-    Comment(Range, String),
 }
 
 fn handle_defaults(c: char, tokens: &mut Vec<TokenType>, pos: Position) {
@@ -79,27 +77,9 @@ pub fn tokenize(string: &str) -> ParseResult<Vec<TokenType>> {
         .chars()
         .enumerate()
         .map(|(pos, c)| {
-            if '\n' == c || pos == string.len() - 1 {
-                if let Some(CurrentTokenType::Comment) = current_type {
-                    let mut pos = pos;
-                    let mut current_char = current_char;
-                    if '\n' != c {
-                        concat_string.push(c);
-                        pos += 1;
-                        current_char += 1;
-                    }
-                    tokens.push(TokenType::Comment(
-                        Range {
-                            start: current_type_start,
-                            end: Position::new(current_line, current_char, pos),
-                        },
-                        concat_string.to_owned(),
-                    ))
-                }
+            if let '\n' = c {
                 current_line += 1;
                 current_char = 0;
-                current_type = None;
-                concat_string = String::new();
                 return Ok(());
             }
             match &current_type {
@@ -174,11 +154,9 @@ pub fn tokenize(string: &str) -> ParseResult<Vec<TokenType>> {
                                 &mut tokens,
                                 Position::new(current_line, current_char, pos),
                             );
-                        } else if !"true".starts_with(&concat_string)
-                            && !"false".starts_with(&concat_string)
-                        {
+                        } else if !"true".starts_with(&concat_string) && !"false".starts_with(&concat_string) {
                             return Err(ParseError::InvalidType);
-                        } else {
+                        }else {
                             concat_string.push(c);
                         }
 
@@ -199,16 +177,6 @@ pub fn tokenize(string: &str) -> ParseResult<Vec<TokenType>> {
                             );
                         } else if !"null".starts_with(&concat_string) {
                             return Err(ParseError::InvalidType);
-                        } else {
-                            concat_string.push(c);
-                        }
-
-                        Ok(())
-                    }
-                    CurrentTokenType::Comment => {
-                        if concat_string == "/" && c != '/' {
-                            current_type = None;
-                            concat_string = String::new();
                         } else {
                             concat_string.push(c);
                         }
@@ -240,12 +208,6 @@ pub fn tokenize(string: &str) -> ParseResult<Vec<TokenType>> {
                         concat_string.push(c);
                         Ok(())
                     }
-                    '/' => {
-                        current_type = Some(CurrentTokenType::Comment);
-                        current_type_start = Position::new(current_line, current_char, pos);
-                        concat_string.push(c);
-                        Ok(())
-                    }
                     _ => {
                         handle_defaults(
                             c,
@@ -271,7 +233,7 @@ mod tests {
 
     #[test]
     fn test_tokenize() {
-        let to_tokenize = "{ \"string\": \"value\", \"null\": null, \"bool1\": false, \"bool2\": true, \"int\": 1, \"float\": 1.0, \"array\": [] \n//bli \n} // bla\n // blub";
+        let to_tokenize = "{ \"string\": \"value\", \"null\": null, \"bool1\": false, \"bool2\": true, \"int\": 1, \"float\": 1.0, \"array\": [] }";
         match tokenize(to_tokenize) {
             Ok(tokens) => {
                 equal_token_single(
@@ -394,36 +356,12 @@ mod tests {
                     )),
                 );
 
-                equal_token_tuple(
-                    tokens.get(29).unwrap(),
-                    &TokenType::Comment(
-                        Range::new(Position::new(1, 0, 103), Position::new(1, 6, 109)),
-                        "//bli ".to_owned(),
-                    ),
-                );
-
                 equal_token_single(
-                    tokens.get(30).unwrap(),
+                    tokens.get(29).unwrap(),
                     &TokenType::ObjectClose(Range::new(
-                        Position::new(2, 0, 110),
-                        Position::new(2, 1, 111),
+                        Position::new(0, 102, 102),
+                        Position::new(0, 103, 103),
                     )),
-                );
-
-                equal_token_tuple(
-                    tokens.get(31).unwrap(),
-                    &TokenType::Comment(
-                        Range::new(Position::new(2, 2, 112), Position::new(2, 8, 118)),
-                        "// bla".to_owned(),
-                    ),
-                );
-
-                equal_token_tuple(
-                    tokens.get(32).unwrap(),
-                    &TokenType::Comment(
-                        Range::new(Position::new(3, 1, 120), Position::new(3, 8, 127)),
-                        "// blub".to_owned(),
-                    ),
                 );
             }
             _ => panic!("Could not tokenize json."),
@@ -452,10 +390,6 @@ mod tests {
             (TokenType::Int(r1, v1), TokenType::Int(r2, v2)) => {
                 equal_range(r1, r2);
                 assert_eq!(v1, v2, "Int not equal. ('{}' != '{}')", v1, v2);
-            }
-            (TokenType::Comment(r1, v1), TokenType::Comment(r2, v2)) => {
-                equal_range(r1, r2);
-                assert_eq!(v1, v2, "Comment not equal. ('{}' != '{}')", v1, v2);
             }
             _ => panic!("Token token '{:?}' does not match '{:?}'", token1, token2),
         }
