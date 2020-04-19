@@ -56,7 +56,7 @@ mod tests {
     use super::tree::{EntryType, PathType};
     #[test]
     fn test_parse() {
-        let json = "// hello\n { \n // this is a test\n \"a\": {}, \"b\": { \"c\": [true, { \"e\": 42 } ] } } // bli \n// bla";
+        let json = "// hulu \n {\"a/b\": {},\n//haha\n \"a\": {}, \"b\": { \"c\": [true, { \"e\": 42 } ] } }\n // hello";
         match super::parse_json(json) {
             Ok(tree) => {
                 let res = tree.value_at(&[PathType::Object("a")]);

@@ -79,6 +79,14 @@ pub fn tokenize(string: &str) -> ParseResult<Vec<TokenType>> {
         .chars()
         .enumerate()
         .map(|(pos, c)| {
+            if '\n' == c && pos != string.len() - 1 {
+                current_line += 1;
+                current_char = 0;
+                current_type = None;
+                concat_string = String::new();
+                return Ok(());
+            }
+
             if '\n' == c || pos == string.len() - 1 {
                 if let Some(CurrentTokenType::Comment) = current_type {
                     let mut pos = pos;
@@ -94,13 +102,10 @@ pub fn tokenize(string: &str) -> ParseResult<Vec<TokenType>> {
                             end: Position::new(current_line, current_char, pos),
                         },
                         concat_string.to_owned(),
-                    ))
+                    ));
+
+                    return Ok(());
                 }
-                current_line += 1;
-                current_char = 0;
-                current_type = None;
-                concat_string = String::new();
-                return Ok(());
             }
             match &current_type {
                 Some(t) => match t {
